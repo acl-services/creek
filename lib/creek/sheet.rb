@@ -21,13 +21,6 @@ module Creek
       @rid = rid
       @state = state
       @sheetfile = sheetfile
-
-      # An XLS file has only 256 columns, however, an XLSX or XLSM file can contain up to 16384 columns.
-      # This function creates a hash with all valid XLSX column names and associated indices.
-      @excel_col_names = Hash.new
-      (0...16384).each do |i|
-        @excel_col_names[col_name(i)] = i
-      end
     end
 
     ##
@@ -45,12 +38,22 @@ module Creek
     end
 
     private
+
     ##
-    # Returns valid Excel column name for a given column index.
-    # For example, returns "A" for 0, "B" for 1 and "AQ" for 42.
-    def col_name i
-      quot = i/26
-      (quot>0 ? col_name(quot-1) : "") + (i%26+65).chr
+    # Returns Excel column index for a given column name.
+    # For example, returns 0 for "A", 1 for "B" and 42 for "AQ".
+    def letter_to_number(letters)
+      @_letter_to_number ||= {}
+      @_letter_to_number[letters] ||= begin
+        result = 0
+
+        # :bytes method returns an enumerator in 1.9.3 and an array in 2.0+
+        letters.bytes.to_a
+          .map { |b| b > 96 ? b - 96 : b - 64 }.reverse
+          .each_with_index { |num, i| result += num * 26 ** i }
+
+        result - 1
+      end
     end
 
     ##
@@ -64,7 +67,7 @@ module Creek
         opener = Nokogiri::XML::Reader::TYPE_ELEMENT
         closer = Nokogiri::XML::Reader::TYPE_END_ELEMENT
         Enumerator.new do |y|
-          shared, row, cells, cell = false, nil, {}, nil
+          row, cells, cell = nil, {}, nil
           cell_type  = nil
           cell_style_idx = nil
           @book.files.file.open(path) do |xml|
@@ -82,9 +85,8 @@ module Creek
                 cell_type      = node.attributes['t']
                 cell_style_idx = node.attributes['s']
                 cell           = node.attributes['r']
-
               elsif (node.name.eql? 'v') and (node.node_type.eql? opener)
-                if !cell.nil?
+                unless cell.nil?
                   cells[cell] = convert(node.inner_xml, cell_type, cell_style_idx)
                 end
               end
@@ -108,20 +110,21 @@ module Creek
     # Empty cells are being padded in using this function
     def fill_in_empty_cells cells, row_number, last_col
       new_cells = Hash.new
+
       unless cells.empty?
-        keys = cells.keys.sort
         last_col = last_col.gsub(row_number, '')
-        last_col_index = @excel_col_names[last_col]
-        [*(0..last_col_index)].each do |i|
-          col = col_name i
-          id = "#{col}#{row_number}"
-          unless cells.has_key? id
-              new_cells[id] = nil
-          else
-            new_cells[id] = cells[id]
-          end
+        last_col_index = letter_to_number(last_col)
+
+        column = "A"
+
+        (0..last_col_index).to_a.each do
+          id = "#{column}#{row_number}"
+          new_cells[id] = cells[id]
+
+          column.next!
         end
       end
+
       new_cells
     end
   end
