@@ -5,6 +5,7 @@ module Creek
     class StyleTypes
       include Creek::Styles::Constants
       attr_accessor :styles_xml_doc
+
       def initialize(styles_xml_doc)
         @styles_xml_doc = styles_xml_doc
       end
@@ -78,7 +79,7 @@ module Creek
         # Looks for one of ymdhis outside of meta-stuff like [Red]
         return :date_time if string =~ /(^|\])[^\[]*[ymdhis]/i
 
-        return :unsupported
+        :unsupported
       end
     end
   end

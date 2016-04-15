@@ -4,6 +4,8 @@ module Creek
   class Styles
     class Converter
       include Creek::Styles::Constants
+      include Creek::HtmlExtractor
+
       ##
       # The heart of typecasting. The ruby type is determined either explicitly
       # from the cell xml or implicitly from the cell style, and this
@@ -39,7 +41,15 @@ module Creek
         ##
 
         when 's' # shared string
-          options[:shared_strings][value.to_i]
+          if options[:with_html]
+            if options[:html_cell]
+              html_from_cell(options[:shared_strings][value.to_i][:html], options[:cell_style])
+            else
+              options[:shared_strings][value.to_i][:text]
+            end
+          else
+            options[:shared_strings][value.to_i]
+          end
         when 'n' # number
           value.to_f
         when 'b'
