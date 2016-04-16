@@ -76,10 +76,15 @@ module Creek
     def convert(value, type, style_idx, cell_name)
       style = book.style_types[style_idx.to_i]
 
-      options = { :shared_strings => @book.shared_strings.dictionary }
-      options.merge!(html_options(cell_name, style_idx)) if book.options[:with_html]
+      Creek::Styles::Converter.call(value, type, style, converter_options(cell_name, style_idx))
+    end
 
-      Creek::Styles::Converter.call(value, type, style, options)
+    def converter_options(cell_name, style_idx)
+      @_converter_options ||= begin
+        options = { :shared_strings => book.shared_strings.dictionary }
+        options.merge!(html_options(cell_name, style_idx)) if book.options[:with_html]
+        options
+      end
     end
 
     def html_options(cell_name, style_idx)
