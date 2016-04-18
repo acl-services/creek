@@ -81,20 +81,18 @@ module Creek
 
     def converter_options(cell_name, style_idx)
       if book.options[:with_html]
-        default_converter_options.merge({
+        default_converter_options.merge(
           :with_html => true,
           :html_cell => html_cell?(cell_name),
           :cell_style => book.cell_styles[style_idx.to_i]
-        })
+        )
       else
         default_converter_options
       end
     end
 
     def default_converter_options
-      @_default_converter_options ||= begin
-        { :shared_strings => book.shared_strings.dictionary }
-      end
+      @_default_converter_options ||= { :shared_strings => book.shared_strings.dictionary }
     end
 
     def html_cell?(cell_name)
@@ -111,7 +109,7 @@ module Creek
       unless cells.empty?
         last_col = last_col.gsub(row_number, '')
 
-        ("A"..last_col).to_a.each do |column|
+        ("A"..last_col).each do |column|
           id = "#{column}#{row_number}"
           new_cells[id] = cells[id]
         end

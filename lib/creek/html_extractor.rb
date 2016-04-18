@@ -40,7 +40,7 @@ module Creek
         when "rPr"
           elem.children.each do |property|
             property_name = property.name.to_sym
-            xml_elems[EXCEL_STYLE_MAP[property_name]] = true if EXCEL_STYLE_MAP.keys.include?(property_name)
+            xml_elems[EXCEL_STYLE_MAP[property_name]] = true if EXCEL_STYLE_MAP.has_key?(property_name)
           end
         when "t"
           str << create_html(elem.content, xml_elems)
@@ -57,16 +57,10 @@ module Creek
 
       # This will return an html string
       def create_html(text, formatting)
-        html = ""
+        html = text
 
         formatting.each do |elem, val|
-          html << "<#{elem}>" if val
-        end
-        html << text
-
-        # reverse formatting
-        Hash[formatting.to_a.reverse].each do |elem, val|
-          html << "</#{elem}>" if val
+          html = "<#{elem}>#{html}</#{elem}>" if val
         end
 
         html
