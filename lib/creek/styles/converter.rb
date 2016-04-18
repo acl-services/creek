@@ -41,15 +41,7 @@ module Creek
         ##
 
         when 's' # shared string
-          if options[:with_html]
-            if options[:html_cell]
-              html_from_cell(options[:shared_strings][value.to_i][:html], options[:cell_style])
-            else
-              options[:shared_strings][value.to_i][:text]
-            end
-          else
-            options[:shared_strings][value.to_i]
-          end
+          shared_string_value(value, options)
         when 'n' # number
           value.to_f
         when 'b'
@@ -123,6 +115,15 @@ module Creek
         end
       end
 
+      def self.shared_string_value(value, options)
+        return options[:shared_strings][value.to_i] unless options[:with_html]
+
+        if options[:html_cell]
+          html_from_cell(options[:shared_strings][value.to_i][:html], options[:cell_style])
+        else
+          options[:shared_strings][value.to_i][:text]
+        end
+      end
     end
   end
 end
