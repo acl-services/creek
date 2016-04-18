@@ -9,10 +9,12 @@ module Creek
     end
 
     def definitions
-      return [] unless styles_xml
+      @_definitions ||= begin
+        return [] unless styles_xml
 
-      styles_xml.css('styleSheet cellXfs xf').map do |xf|
-        fonts[xf['fontId'].to_i]
+        styles_xml.css('styleSheet cellXfs xf').map do |xf|
+          fonts[xf['fontId'].to_i]
+        end
       end
     end
 
