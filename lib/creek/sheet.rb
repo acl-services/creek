@@ -80,19 +80,21 @@ module Creek
     end
 
     def converter_options(cell_name, style_idx)
+      if book.options[:with_html]
+        default_converter_options.merge({
+          :with_html => true,
+          :html_cell => html_cell?(cell_name),
+          :cell_style => book.cell_styles[style_idx.to_i]
+        })
+      else
+        default_converter_options
+      end
+    end
+
+    def default_converter_options
       @_default_converter_options ||= begin
         { :shared_strings => book.shared_strings.dictionary }
       end
-
-      book.options[:with_html] ? html_options(cell_name, style_idx) : @_default_converter_options
-    end
-
-    def html_options(cell_name, style_idx)
-      @_default_converter_options.merge({
-        :with_html => true,
-        :html_cell => html_cell?(cell_name),
-        :cell_style => book.cell_styles[style_idx.to_i]
-      })
     end
 
     def html_cell?(cell_name)
