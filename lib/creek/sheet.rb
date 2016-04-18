@@ -84,7 +84,7 @@ module Creek
         { :shared_strings => book.shared_strings.dictionary }
       end
 
-      book.options[:with_html] ?  html_options(cell_name, style_idx) : @_default_converter_options
+      book.options[:with_html] ? html_options(cell_name, style_idx) : @_default_converter_options
     end
 
     def html_options(cell_name, style_idx)
@@ -97,7 +97,7 @@ module Creek
 
     def html_cell?(cell_name)
       cell_column_name = cell_name[/[A-Z]+/]
-      book.options[:html_columns].include? cell_column_name
+      html_columns && html_columns.include?(cell_column_name)
     end
 
     ##
@@ -116,6 +116,10 @@ module Creek
       end
 
       new_cells
+    end
+
+    def html_columns
+      book.options[:html_columns]
     end
   end
 end
