@@ -1,8 +1,9 @@
 module Creek
   class Styles
-    attr_accessor :book
-    def initialize(book)
-      @book = book
+    attr_accessor :files
+
+    def initialize(files)
+      @files = files
     end
 
     def path
@@ -11,8 +12,8 @@ module Creek
 
     def styles_xml
       @styles_xml ||= begin
-        if @book.files.file.exist?(path)
-          doc = @book.files.file.open path
+        if files.file.exist?(path)
+          doc = files.file.open path
           Nokogiri::XML::Document.parse doc
         end
       end

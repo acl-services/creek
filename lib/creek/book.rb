@@ -2,21 +2,19 @@ require 'zip/filesystem'
 require 'nokogiri'
 
 module Creek
-
   class Creek::Book
+    attr_reader :files, :sheets, :shared_strings, :cell_styles, :options
 
-    attr_reader :files,
-                :sheets,
-                :shared_strings
-
-    def initialize path, options = {}
-      check_file_extension = options.fetch(:check_file_extension, true)
-      if check_file_extension
+    def initialize(path, options = {})
+      if options.fetch(:check_file_extension, true)
         extension = File.extname(options[:original_filename] || path).downcase
         raise 'Not a valid file format.' unless (['.xlsx', '.xlsm'].include? extension)
       end
-      @files = Zip::File.open path
-      @shared_strings = SharedStrings.new(self)
+
+      @files = Zip::File.open(path)
+      @cell_styles = CellStyles.new(styles)
+      @shared_strings = SharedStrings.new(files, options)
+      @options = options
     end
 
     def sheets
@@ -31,7 +29,7 @@ module Creek
     end
 
     def style_types
-      @style_types ||= Creek::Styles.new(self).style_types
+      @style_types ||= styles.style_types
     end
 
     def close
@@ -57,6 +55,12 @@ module Creek
 
         result
       end
+    end
+
+    private
+
+    def styles
+      @_styles ||= Creek::Styles.new(files)
     end
   end
 end
