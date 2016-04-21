@@ -92,7 +92,10 @@ module Creek
     end
 
     def default_converter_options
-      @_default_converter_options ||= { :shared_strings => book.shared_strings.dictionary }
+      @_default_converter_options ||= {
+        :shared_strings => book.shared_strings.dictionary,
+        :base_date => book.base_date
+      }
     end
 
     def html_cell?(cell_name)
