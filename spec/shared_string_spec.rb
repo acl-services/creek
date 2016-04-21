@@ -1,18 +1,16 @@
 require './spec/spec_helper'
 
-describe 'shared strings' do
+describe Creek::SharedStrings do
+  let(:xml_file) { File.open("spec/fixtures/sst.xml") }
+  let(:file) { double(:file, :exist? => true, :open => xml_file) }
+  let(:files) { double(:files, :file => file) }
 
-  it 'parses rich text strings correctly' do
-    shared_strings_xml_file = File.open('spec/fixtures/sst.xml')
-    doc = Nokogiri::XML(shared_strings_xml_file)
-    dictionary = Creek::SharedStrings.parse_shared_string_from_document(doc)
+  describe "#dictionary" do
+    subject(:dictionary) { described_class.new(files).dictionary }
 
-    dictionary.keys.size.should == 5
-    dictionary[0].should == 'Cell A1'
-    dictionary[1].should == 'Cell B1'
-    dictionary[2].should == 'My Cell'
-    dictionary[3].should == 'Cell A2'
-    dictionary[4].should == 'Cell B2'
+    it "parses rich text strings correctly" do
+      expect(dictionary.size).to eq 5
+      expect(dictionary).to match_array(['Cell A1', 'Cell B1', 'My Cell', 'Cell A2', 'Cell B2'])
+    end
   end
-
 end
