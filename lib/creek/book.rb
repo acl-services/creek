@@ -28,7 +28,15 @@ module Creek
       rels = Nokogiri::XML::Document.parse(rels_doc).css("Relationship")
       @sheets = xml.css('sheet').map do |sheet|
         sheetfile = rels.find { |el| sheet.attr("r:id") == el.attr("Id") }.attr("Target")
-        Sheet.new(self, sheet.attr("name"), sheet.attr("sheetid"),  sheet.attr("state"), sheet.attr("visible"), sheet.attr("r:id"), sheetfile)
+        Sheet.new(
+          self,
+          sheet.attr("name"),
+          sheet.attr("sheetid"),
+          sheet.attr("state"),
+          sheet.attr("visible"),
+          sheet.attr("r:id"),
+          sheetfile
+        )
       end
     end
 
