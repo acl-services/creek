@@ -6,11 +6,21 @@ describe Creek::SharedStrings do
   let(:files) { double(:files, :file => file) }
 
   describe "#dictionary" do
-    subject(:dictionary) { described_class.new(files).dictionary }
+    let(:options) { {} }
+    subject(:dictionary) { described_class.new(files, options).dictionary }
 
     it "parses rich text strings correctly" do
       expect(dictionary.size).to eq 5
-      expect(dictionary).to match_array(['Cell A1', 'Cell B1', 'My Cell', 'Cell A2', 'Cell B2'])
+      expect(dictionary).to match_array(["Cell A1", "Cell B1", "My Cell", "Cell A2", "Cell B2"])
+    end
+
+    context "when :with_html option enabled" do
+      let(:options) { { :with_html => true } }
+
+      it "returns xml nodes" do
+        expect(dictionary.size).to eq 5
+        expect(dictionary).to all be_instance_of Nokogiri::XML::Element
+      end
     end
   end
 end
