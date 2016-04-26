@@ -18,12 +18,7 @@ module Creek
       end
 
       def html_from(node, cell_style)
-        node.children.map do |elem|
-          case elem.name
-          when "r" then html_from_xml(elem, cell_style)
-          when "t" then elem.content
-          end
-        end.join.gsub(/[\r\n]/, "<br>")
+        node.children.map { |elem| html_from_xml(elem, cell_style) }.join.gsub(/[\r\n]/, "<br>")
       end
 
       def html_from_xml(node, cell_style)
@@ -36,7 +31,7 @@ module Creek
             EXCEL_STYLE_MAP.each do |property, tag|
               xml_elems[tag] = true unless elem.children.css(property.to_s).empty?
             end
-          when "t"
+          when "t", "text"
             xml_elems.merge!(cell_style) { |_, xml, cell| xml | cell } if node.css("rPr sz, rPr rFont").empty?
             str << create_html(elem.content, xml_elems)
           end
