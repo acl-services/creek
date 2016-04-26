@@ -18,18 +18,12 @@ module Creek
       end
 
       def html_from(node, cell_style)
-        html_string = ""
-
-        node.children.each do |elem|
-          html_string <<
-            case elem.name
-              when "r" then html_from_xml(elem, cell_style)
-              when "t" then elem.content
-              else ""
-            end
-        end
-
-        html_string.gsub(/[\r\n]/, "<br>")
+        node.children.map do |elem|
+          case elem.name
+          when "r" then html_from_xml(elem, cell_style)
+          when "t" then elem.content
+          end
+        end.join.gsub(/[\r\n]/, "<br>")
       end
 
       def html_from_xml(node, cell_style)
@@ -53,13 +47,7 @@ module Creek
 
       # This will return an html string
       def create_html(text, formatting)
-        html = text
-
-        formatting.each do |elem, val|
-          html = "<#{elem}>#{html}</#{elem}>" if val
-        end
-
-        html
+        formatting.inject(text) { |res, (tag, val)| val ? "<#{tag}>#{res}</#{tag}>" : res }
       end
     end
   end
