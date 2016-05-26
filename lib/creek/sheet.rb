@@ -62,6 +62,9 @@ module Creek
                 cell_type      = node.attributes['t']
                 cell_style_idx = node.attributes['s']
                 cell           = node.attributes['r']
+              elsif (node.name.eql? 'is') and (node.node_type.eql? opener)
+                value = Nokogiri::XML(node.inner_xml).css('t').text
+                cells[cell] = convert(value, cell_type, cell_style_idx, cell)
               elsif (node.name.eql? 'v') and (node.node_type.eql? opener)
                 unless cell.nil?
                   cells[cell] = convert(node.inner_xml, cell_type, cell_style_idx, cell)
