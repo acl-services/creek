@@ -39,12 +39,24 @@ describe Creek::Styles::Converter do
       it { is_expected.to be_truthy }
     end
 
-    context "when type is date time" do
+    context "when type is date" do
       let(:value) { "41275" }
       let(:type) { "n" }
       let(:style) { :date_time }
 
       it { is_expected.to eq Date.new(2013, 01, 01) }
+
+      context "when type is time" do
+        let(:value) { "0.3833333333333333" }
+
+        it { is_expected.to eq Time.utc(1899, 12, 30, 9, 12) }
+      end
+
+      context "when type is date time" do
+        let(:value) { "40910.5" }
+
+        it { is_expected.to eq DateTime.civil(2012, 1, 2, 12, 0) }
+      end
     end
   end
 end
