@@ -87,10 +87,20 @@ module Creek
 
         if fraction_of_24 > 0 # there is a time associated
           seconds = (fraction_of_24 * 86400).round
-          return Time.utc(date.year, date.month, date.day) + seconds
+          time = create_time(date) + seconds
+
+          time.year == 1899 ? time : create_date_time(time)
         else
-          return date
+          date
         end
+      end
+
+      def self.create_time(date)
+        Time.utc(date.year, date.month, date.day)
+      end
+
+      def self.create_date_time(time)
+        DateTime.civil(time.year, time.month, time.day, time.hour, time.min, time.sec)
       end
 
       def self.convert_bignum(value)
