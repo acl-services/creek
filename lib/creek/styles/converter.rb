@@ -103,11 +103,16 @@ module Creek
 
       def self.shared_string_value(value, options)
         return options[:shared_strings][value.to_i] unless options[:with_html]
+        node_options = {
+          :ignore_phonetic_fields => options[:ignore_phonetic_fields]
+        }
 
         if options[:html_cell]
-          html_from(options[:shared_strings][value.to_i], options[:cell_style])
+          node_options[:cell_style] = options[:cell_style]
+
+          html_from(options[:shared_strings][value.to_i], node_options)
         else
-          text_from(options[:shared_strings][value.to_i])
+          text_from(options[:shared_strings][value.to_i], node_options)
         end
       end
     end

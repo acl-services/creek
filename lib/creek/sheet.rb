@@ -94,7 +94,8 @@ module Creek
     def default_converter_options
       @_default_converter_options ||= {
         :shared_strings => book.shared_strings.dictionary,
-        :base_date => book.base_date
+        :base_date => book.base_date,
+        :ignore_phonetic_fields => book.options[:ignore_phonetic_fields]
       }
     end
 
