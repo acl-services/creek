@@ -21,7 +21,7 @@ module Creek
         xml = Nokogiri::XML::Document.parse doc
 
         @dictionary ||= xml.css('si').map do |node|
-          options[:with_html] ? node : text_from(node)
+          options[:with_html] ? node : text_from(node, options)
         end
       end
     end

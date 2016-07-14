@@ -8,20 +8,26 @@ module Creek
 
     private
 
-    def text_from(node)
-      self.class.text_from(node)
+    def text_from(node, options = {})
+      self.class.text_from(node, options)
     end
 
     module ClassMethods
-      def text_from(node)
-        node.css("t").map(&:content).join('')
+      def text_from(node, options = {})
+        text_nodes = node.css("t").reject do |text_node|
+          options[:ignore_phonetic_fields] && text_node.parent.name == "rPh"
+        end
+
+        text_nodes.map(&:content).join('')
       end
 
-      def html_from(node, cell_style)
-        node.children.map { |elem| html_from_xml(elem, cell_style) }.join.gsub(/[\r\n]/, "<br>")
+      def html_from(node, html_options = {})
+        node.children.map { |elem| html_from_xml(elem, html_options) }.join.gsub(/[\r\n]/, "<br>")
       end
 
-      def html_from_xml(node, cell_style)
+      def html_from_xml(node, html_options)
+        return "" if html_options[:ignore_phonetic_fields] && node.name == "rPh"
+
         str = ""
         xml_elems = { strong: false, em: false, u: false }
 
@@ -32,7 +38,10 @@ module Creek
               xml_elems[tag] = true unless elem.children.css(property.to_s).empty?
             end
           when "t", "text"
-            xml_elems.merge!(cell_style) { |_, xml, cell| xml | cell } if node.css("rPr sz, rPr rFont").empty?
+            if node.css("rPr sz, rPr rFont").empty?
+              xml_elems.merge!(html_options[:cell_style] || {}) { |_, xml, cell| xml | cell }
+            end
+
             str << create_html(elem.content, xml_elems)
           end
         end
