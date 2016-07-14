@@ -1,3 +1,2 @@
-require 'creek'
-require 'pry'
-
+require "creek"
+require "pry"

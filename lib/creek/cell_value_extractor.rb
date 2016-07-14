@@ -39,7 +39,7 @@ module Creek
             end
           when "t", "text"
             if node.css("rPr sz, rPr rFont").empty?
-              xml_elems.merge!(html_options[:cell_style]) { |_, xml, cell| xml | cell }
+              xml_elems.merge!(html_options[:cell_style] || {}) { |_, xml, cell| xml | cell }
             end
 
             str << create_html(elem.content, xml_elems)

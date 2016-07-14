@@ -47,4 +47,60 @@ describe Creek::Styles::Converter do
       it { is_expected.to eq Date.new(2013, 01, 01) }
     end
   end
+
+  describe ".shared_string_value" do
+    let(:shared_strings) { double(:shared_strings, :[] => shared_string_value) }
+    let(:shared_string_value) { "value" }
+
+    let(:value) { 0 }
+    let(:options) { { :shared_strings => shared_strings }.merge(additional_options) }
+    let(:additional_options) { {} }
+
+    subject(:value_from_node) do
+      described_class.shared_string_value(value, options)
+    end
+
+    it { is_expected.to eq "value" }
+
+    context "when :with_html option is present" do
+      let(:additional_options) { { :with_html => true } }
+
+      it "returns text from node" do
+        expect(described_class).to receive(:text_from).with("value", hash_including(:ignore_phonetic_fields))
+
+        value_from_node
+      end
+
+      context "when :ignore_phonetic_fields option is present" do
+        let(:additional_options) { { :with_html => true, :ignore_phonetic_fields => true } }
+
+        it "returns text from node" do
+          expect(described_class).to receive(:text_from).with("value", hash_including(:ignore_phonetic_fields => true))
+
+          value_from_node
+        end
+      end
+
+      context "when :html_cell option is present" do
+        let(:additional_options) { { :with_html => true, :html_cell => true } }
+
+        it "returns html from node" do
+          expect(described_class).to receive(:html_from).with("value", hash_including(:cell_style))
+
+          value_from_node
+        end
+
+        context "when :ignore_phonetic_fields option is present" do
+          let(:additional_options) { { :with_html => true, :html_cell => true, :ignore_phonetic_fields => true } }
+
+          it "returns text from node" do
+            expect(described_class).to receive(:html_from)
+              .with("value", hash_including(:ignore_phonetic_fields => true))
+
+            value_from_node
+          end
+        end
+      end
+    end
+  end
 end
