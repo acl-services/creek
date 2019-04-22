@@ -25,6 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 2.13.0'
   spec.add_development_dependency 'pry'
 
-  spec.add_dependency 'nokogiri', '~> 1.8.1'
+  spec.add_dependency 'nokogiri', '~> 1.10.3'
   spec.add_dependency 'rubyzip', '>= 1.0.0'
 end
